@@ -22,11 +22,11 @@
         v-model="leftDrawerOpen"
         show-if-above
         :width="200"
-        :breakpoint="400"
+        :breakpoint="600"
       >
         <q-scroll-area style="height: calc(100% - 192px); margin-top: 192px; border-right: 1px solid #ddd">
           <q-list padding>
-            <q-item clickable v-ripple>
+            <q-item clickable v-ripple to="/" exact>
               <q-item-section avatar>
                 <q-icon name="list" />
               </q-item-section>
@@ -35,7 +35,7 @@
                 Todo
               </q-item-section>
             </q-item>
-            <q-item clickable v-ripple>
+            <q-item clickable v-ripple to="/help">
               <q-item-section avatar>
                 <q-icon name="help" />
               </q-item-section>
@@ -58,7 +58,9 @@
         </q-img>
       </q-drawer>
     <q-page-container>
-      <router-view />
+      <keep-alive>
+        <router-view/>
+      </keep-alive>
     </q-page-container>
   </q-layout>
 </template>
