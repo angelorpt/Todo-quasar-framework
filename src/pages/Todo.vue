@@ -13,7 +13,7 @@
         dense
       >
       <template v-slot:append>
-        <q-btn round dense flat icon="add" />
+        <q-btn round dense flat icon="add" @click="addTask"/>
       </template>
       </q-input>
     </div>
@@ -63,6 +63,10 @@ export default {
   },
   methods: {
     addTask () {
+      if (this.newTask === '') {
+        this.$q.notify('Informe a tarefa')
+        return null
+      }
       this.tasks.push({
         title: this.newTask,
         done: false
