@@ -57,6 +57,7 @@ export default {
         persistent: true
       }).onOk(() => {
         this.tasks.splice(index, 1)
+        this.$q.notify('Tarefa deletada')
       })
     }
   }
