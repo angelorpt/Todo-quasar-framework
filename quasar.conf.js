@@ -163,6 +163,7 @@ module.exports = function (ctx) {
 
         // Windows only
         // win32metadata: { ... }
+        plataform: ['win32', 'linux']
       },
 
       builder: {

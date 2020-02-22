@@ -3,7 +3,7 @@
 
     <div class="row q-pa-sm bg-primary">
       <q-input
-        v-model="newTask"
+        v-model="newTask.titulo"
         @keyup.enter="addTask"
         class="col"
         square
@@ -22,22 +22,22 @@
 
       <q-item
         v-ripple
-        v-for="(task, index) in tasks"
+        v-for="(task) in tasks"
         :key="task.index"
-        @click="task.done = !task.done"
-        :class="{ 'done bg-blue-1' : task.done }"
+        @click="task.realizado = !task.realizado"
+        :class="{ 'done bg-blue-1' : task.realizado }"
         clickable >
 
         <q-item-section avatar>
-          <q-checkbox v-model="task.done" color="primary" class="no-pointer-events"/>
+          <q-checkbox v-model="task.realizado" color="primary" class="no-pointer-events"/>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label>{{ task.title }}</q-item-label>
+          <q-item-label>{{ task.titulo }}</q-item-label>
         </q-item-section>
 
-        <q-item-section v-if="task.done" side>
-           <q-btn flat round dense color="primary" icon="delete" @click.stop="deleteTask(index)"/>
+        <q-item-section v-if="task.realizado" side>
+           <q-btn flat round dense color="primary" icon="delete" @click.stop="deleteTask(task)"/>
         </q-item-section>
 
       </q-item>
@@ -57,39 +57,91 @@
 export default {
   data () {
     return {
-      newTask: '',
+      newTask: {
+        titulo: '',
+        descricao: null,
+        data_vencimento: null,
+        data_realizado: null,
+        realizado: false
+      },
       tasks: []
     }
   },
+  mounted () {
+    this.getTasks()
+  },
   methods: {
+    getTasks () {
+      this.$axios.get('https://sistemas.offboard.com.br/api/tasks')
+        .then(response => {
+          // console.log(response)
+          this.tasks = response.data
+        })
+    },
     addTask () {
-      if (this.newTask === '') {
+      if (this.newTask.titulo === '') {
         this.$q.notify('Informe a tarefa')
         return null
       }
-      this.tasks.push({
-        title: this.newTask,
-        done: false
-      })
-      this.newTask = ''
+
+      this.$axios.post('https://sistemas.offboard.com.br/api/tasks', this.newTask)
+        .then(response => {
+          // console.log(response)
+          this.newTask = this.emptyTask()
+          this.getTasks()
+        })
     },
-    deleteTask (index) {
+    deleteTask (task) {
       this.$q.dialog({
-        title: 'Excluir',
+        titulo: 'Excluir',
         message: 'Deseja excluir esta tarefa?',
         cancel: true,
         persistent: true
       }).onOk(() => {
-        this.tasks.splice(index, 1)
-        this.$q.notify('Tarefa deletada')
+        this.$axios.delete('https://sistemas.offboard.com.br/api/tasks/' + task.id)
+          .then(response => {
+            this.$q.notify('Tarefa deletada')
+            this.getTasks()
+          })
       })
+    },
+    emptyTask () {
+      return {
+        titulo: '',
+        descricao: null,
+        data_vencimento: null,
+        data_realizado: null,
+        realizado: false
+      }
     }
+    // addTask () {
+    //   if (this.newTask === '') {
+    //     this.$q.notify('Informe a tarefa')
+    //     return null
+    //   }
+    //   this.tasks.push({
+    //     titulo: this.newTask,
+    //     done: false
+    //   })
+    //   this.newTask = ''
+    // },
+    // deleteTask (index) {
+    //   this.$q.dialog({
+    //     titulo: 'Excluir',
+    //     message: 'Deseja excluir esta tarefa?',
+    //     cancel: true,
+    //     persistent: true
+    //   }).onOk(() => {
+    //     this.tasks.splice(index, 1)
+    //     this.$q.notify('Tarefa deletada')
+    //   })
+    // }
   }
 }
 </script>
 
 <style lang="scss">
-  .done {
+  .realizado {
     .q-item__label {
       text-decoration: line-through;
       color: #bbb;
