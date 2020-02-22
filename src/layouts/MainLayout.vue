@@ -12,7 +12,7 @@
         />
       </q-toolbar>
       <div class="q-px-lg q-pt-xl q-mb-md">
-        <div class="text-h3">Todo</div>
+        <div class="text-h3">To-Do</div>
         <div class="text-subtitle1">{{ todaysDate }}</div>
       </div>
       <q-img src="statics/mountains.jpg" class="header-image absolute-top"/>
@@ -32,7 +32,7 @@
               </q-item-section>
 
               <q-item-section>
-                Todo
+                To-Do
               </q-item-section>
             </q-item>
             <q-item clickable v-ripple to="/help">

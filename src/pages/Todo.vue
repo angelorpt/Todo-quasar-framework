@@ -1,24 +1,17 @@
 <template>
   <q-page class="bg-grey-3 column">
 
-    <div class="row q-pa-sm bg-primary">
-      <q-input
-        v-model="newTask.titulo"
-        @keyup.enter="addTask"
-        class="col"
-        square
-        filled
-        bg-color="white"
-        placeholder="Adicionar Tarefa"
-        dense
-      >
-      <template v-slot:append>
-        <q-btn round dense flat icon="add" @click="addTask"/>
-      </template>
-      </q-input>
-    </div>
+    <!-- <q-page-sticky position="top-right" :offset="[18, 0]" >
+      <q-btn fab icon="add" color="primary" @click="prompt = true"/>
+    </q-page-sticky> -->
 
     <q-list class="bg-white" separator bordered>
+
+      <q-item>
+        <q-item-section flat fab dense class="secondary">
+          <q-btn color="primary" icon-right="add" label="Nova Tarefa" @click="prompt = true" />
+        </q-item-section>
+      </q-item>
 
       <q-item
         v-ripple
@@ -44,12 +37,57 @@
 
     </q-list>
 
+    <!-- sem tarefas -->
     <div class="no-tasks absolute-center" v-if="!tasks.length">
       <q-icon name="check" size="100px" color="primary"/>
       <div class="text-h5 text-primary text-center">
         Sem Tarefas
       </div>
     </div>
+
+    <q-dialog v-model="prompt" persistent>
+      <q-card style="min-width: 350px">
+
+        <!-- header -->
+        <q-item>
+          <q-item-section avatar>
+            <q-avatar>
+              <q-icon name="assignment" round class="text-primary"/>
+            </q-avatar>
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label>Nova Tarefa</q-item-label>
+            <q-item-label caption>
+              Cadastre sua nova tarefa
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-separator />
+
+        <!-- Campos de cadastro -->
+        <q-card-section class="q-pt-none">
+          <q-input label="Título" v-model="task.titulo"/>
+          <q-input label="Descrição" type="textarea" v-model="task.descricao"/>
+          <q-input placeholder="Vencimento" v-model="task.data_vencimento" mask="date" >
+            <template v-slot:append>
+              <q-icon name="event" class="cursor-pointer">
+                <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+                  <q-date v-model="task.data_vencimento" @input="() => $refs.qDateProxy.hide()" />
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+        </q-card-section>
+
+        <!-- Botões confirmação -->
+        <q-card-actions align="right" class="text-primary">
+          <q-btn flat label="Cancelar" v-close-popup />
+          <q-btn flat label="Salvar" v-close-popup @click="addTask"/>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -57,13 +95,15 @@
 export default {
   data () {
     return {
-      newTask: {
+      task: {
         titulo: '',
         descricao: null,
         data_vencimento: null,
         data_realizado: null,
         realizado: false
       },
+      prompt: null,
+      address: '',
       tasks: []
     }
   },
@@ -79,15 +119,15 @@ export default {
         })
     },
     addTask () {
-      if (this.newTask.titulo === '') {
+      if (this.task.titulo === '') {
         this.$q.notify('Informe a tarefa')
         return null
       }
 
-      this.$axios.post('https://sistemas.offboard.com.br/api/tasks', this.newTask)
+      this.$axios.post('https://sistemas.offboard.com.br/api/tasks', this.task)
         .then(response => {
           // console.log(response)
-          this.newTask = this.emptyTask()
+          this.task = this.emptyTask()
           this.getTasks()
         })
     },
@@ -115,15 +155,15 @@ export default {
       }
     }
     // addTask () {
-    //   if (this.newTask === '') {
+    //   if (this.task === '') {
     //     this.$q.notify('Informe a tarefa')
     //     return null
     //   }
     //   this.tasks.push({
-    //     titulo: this.newTask,
+    //     titulo: this.task,
     //     done: false
     //   })
-    //   this.newTask = ''
+    //   this.task = ''
     // },
     // deleteTask (index) {
     //   this.$q.dialog({
