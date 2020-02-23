@@ -2,8 +2,8 @@
   "name": "todo-quasar",
   "version": "0.0.1",
   "description": "A Quasar Framework app",
-  "productName": "Quasar App",
-  "cordovaId": "org.cordova.quasar.app",
+  "productName": "ToDo List",
+  "cordovaId": "br.com.todolist.quasar",
   "capacitorId": "",
   "author": "Angelo R. Pinto",
   "private": true,
@@ -14,6 +14,8 @@
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
     "quasar": "^1.0.0"
   },
   "devDependencies": {

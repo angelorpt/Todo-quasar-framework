@@ -11,9 +11,6 @@
         <q-item-section flat fab dense class="secondary">
           <q-btn color="primary" icon-right="add" label="Nova Tarefa" @click="prompt = true" />
         </q-item-section>
-        <q-item-section flat fab dense side class="secondary">
-          <q-btn color="primary" label="Consultar" @click="dlg_consultar = true" />
-        </q-item-section>
       </q-item>
 
       <q-item
@@ -39,6 +36,22 @@
       </q-item>
 
     </q-list>
+
+  <div class="q-pa-md">
+    <div class="q-gutter-md">
+      <q-date
+        v-model="date"
+        :events="events"
+        :event-color="(date) => date[9] % 2 === 0 ? 'teal' : 'orange'"
+      />
+
+      <q-date
+        v-model="date"
+        :events="eventsFn"
+        :event-color="(date) => date[9] % 2 === 0 ? 'teal' : 'orange'"
+      />
+    </div>
+  </div>
 
     <!-- sem tarefas -->
     <div class="no-tasks absolute-center" v-if="!tasks.length">
@@ -91,49 +104,6 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-
-    <q-dialog v-model="dlg_consultar" persistent>
-      <q-card style="min-width: 350px">
-
-        <!-- header -->
-        <q-item>
-          <q-item-section avatar>
-            <q-avatar>
-              <q-icon name="assignment" round class="text-primary"/>
-            </q-avatar>
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label>Consultar</q-item-label>
-            <q-item-label caption>
-              Selecione a data de vencimento
-            </q-item-label>
-          </q-item-section>
-        </q-item>
-
-        <q-separator />
-
-        <!-- Campos de cadastro -->
-        <q-card-section class="q-pt-none">
-          <q-date
-            v-model="dataSel"
-            filled
-            round
-            dense
-            :events="eventsFn"
-            event-color="orange"
-          />
-        </q-card-section>
-
-        <!-- Botões confirmação -->
-        <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Cancelar" v-close-popup />
-          <q-btn flat label="Todos" v-close-popup @click="consultarTodos"/>
-          <q-btn flat label="Consultar" v-close-popup @click="consultarTasks"/>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-
   </q-page>
 </template>
 
@@ -141,7 +111,6 @@
 export default {
   data () {
     return {
-      splitterModel: '',
       task: {
         titulo: '',
         descricao: null,
@@ -150,63 +119,31 @@ export default {
         realizado: false
       },
       prompt: null,
-      dlg_consultar: null,
       address: '',
       tasks: [],
-      allTasks: [],
-      dataSel: '',
-      events: []
+      date: '2019/02/01',
+      events: [ '2019/02/01', '2019/02/05', '2019/02/06', '2019/02/09', '2019/02/23' ]      
     }
   },
   mounted () {
     this.getTasks()
   },
-  watch: {
-    dataSel () {
-      console.log(this.dataSel)
-    },
-    allTasks () {
-      var vm = this
-      const unique = this._.uniqBy(this.allTasks, 'data_vencimento')
-      this.events = vm._.map(unique, (element) => {
-        if (element.data_vencimento != null) {
-          return this.moment(element.data_vencimento).format('YYYY/MM/DD')
-        }
-      })
-      this.dataSel = this.moment().format('YYYY/MM/DD')
-    }
-  },
   methods: {
-    consultarTasks () {
-      const lstTasks = this._.filter(this.allTasks, { data_vencimento: this.dataSel })
-      if (lstTasks !== undefined) {
-        if (this._.isArray(lstTasks)) {
-          this.tasks = lstTasks
-        } else {
-          this.tasks = [lstTasks]
-        }
-      } else {
-        this.tasks = []
-      }
-    },
-    consultarTodos () {
-      this.tasks = this.allTasks
-    },
     eventsFn (date) {
-      if (this._.indexOf(this.events, this.moment(date).format('YYYY/MM/DD')) > -1) {
+      if (date === '2019/02/01' ||
+        date === '2019/02/05' ||
+        date === '2019/02/06' ||
+        date === '2019/02/09' ||
+        date === '2019/02/23') {
         return true
-      } else {
-        return false
       }
+      return false
     },
     getTasks () {
       this.$axios.get('https://sistemas.offboard.com.br/api/tasks')
         .then(response => {
-          this.allTasks = this._.map(response.data, (element) => {
-            element.data_vencimento = this.moment(element.data_vencimento).format('YYYY/MM/DD')
-            element.realizado = (element.realizdo === 0)
-            return element
-          })
+          // console.log(response)
+          this.tasks = response.data
         })
     },
     addTask () {
