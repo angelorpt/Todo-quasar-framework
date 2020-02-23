@@ -20,7 +20,7 @@
         v-ripple
         v-for="(task) in tasks"
         :key="task.index"
-        @click="task.realizado = !task.realizado"
+        @click="updateTask(task)"
         :class="{ 'done bg-blue-1' : task.realizado }"
         clickable >
 
@@ -204,7 +204,7 @@ export default {
         .then(response => {
           this.allTasks = this._.map(response.data, (element) => {
             element.data_vencimento = this.moment(element.data_vencimento).format('YYYY/MM/DD')
-            element.realizado = (element.realizdo === 0)
+            element.realizado = (parseInt(element.realizado) === 1)
             return element
           })
         })
@@ -217,8 +217,14 @@ export default {
 
       this.$axios.post('https://sistemas.offboard.com.br/api/tasks', this.task)
         .then(response => {
-          // console.log(response)
           this.task = this.emptyTask()
+          this.getTasks()
+        })
+    },
+    updateTask (task) {
+      task.realizado = !task.realizado
+      this.$axios.put('https://sistemas.offboard.com.br/api/tasks/' + task.id, task)
+        .then(response => {
           this.getTasks()
         })
     },
