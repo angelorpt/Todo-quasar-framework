@@ -9,10 +9,13 @@
 
       <q-item>
         <q-item-section flat fab dense class="secondary">
-          <q-btn color="primary" icon-right="add" label="Nova Tarefa" @click="prompt = true" />
+          <q-btn color="primary" icon-right="add" label="Nova" @click="prompt = true" />
         </q-item-section>
         <q-item-section flat fab dense side class="secondary">
           <q-btn color="primary" label="Consultar" @click="dlg_consultar = true" />
+        </q-item-section>
+        <q-item-section flat round fab dense side >
+          <q-btn color="primary" icon="refresh" @click="refreshTask"/>
         </q-item-section>
       </q-item>
 
@@ -159,12 +162,9 @@ export default {
     }
   },
   mounted () {
-    this.getTasks()
+    this.refreshTask()
   },
   watch: {
-    dataSel () {
-      console.log(this.dataSel)
-    },
     allTasks () {
       var vm = this
       const unique = this._.uniqBy(this.allTasks, 'data_vencimento')
@@ -173,23 +173,31 @@ export default {
           return this.moment(element.data_vencimento).format('YYYY/MM/DD')
         }
       })
-      this.dataSel = this.moment().format('YYYY/MM/DD')
     }
   },
   methods: {
     consultarTasks () {
-      const lstTasks = this._.filter(this.allTasks, { data_vencimento: this.dataSel })
-      if (lstTasks !== undefined) {
-        if (this._.isArray(lstTasks)) {
-          this.tasks = lstTasks
-        } else {
-          this.tasks = [lstTasks]
-        }
+      if (this.dataSel === '') {
+        this.tasks = this.allTasks
       } else {
-        this.tasks = []
+        const lstTasks = this._.filter(this.allTasks, { data_vencimento: this.dataSel })
+        if (lstTasks !== undefined) {
+          if (this._.isArray(lstTasks)) {
+            this.tasks = lstTasks
+          } else {
+            this.tasks = [lstTasks]
+          }
+        } else {
+          this.tasks = []
+        }
       }
     },
+    refreshTask () {
+      this.getTasks()
+      this.consultarTasks()
+    },
     consultarTodos () {
+      this.dataSel = ''
       this.tasks = this.allTasks
     },
     eventsFn (date) {
@@ -207,6 +215,7 @@ export default {
             element.realizado = (parseInt(element.realizado) === 1)
             return element
           })
+          this.consultarTasks()
         })
     },
     addTask () {
@@ -218,6 +227,7 @@ export default {
       this.$axios.post('https://sistemas.offboard.com.br/api/tasks', this.task)
         .then(response => {
           this.task = this.emptyTask()
+          this.dataSel = ''
           this.getTasks()
         })
     },

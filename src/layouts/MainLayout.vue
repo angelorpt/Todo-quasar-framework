@@ -12,7 +12,7 @@
         />
       </q-toolbar>
       <div class="q-px-lg q-pt-xl q-mb-md">
-        <div class="text-h3">To-Do</div>
+        <div class="text-h3">To Do</div>
         <div class="text-subtitle1">{{ todaysDate }}</div>
       </div>
       <q-img src="statics/mountains.jpg" class="header-image absolute-top"/>
@@ -26,13 +26,13 @@
       >
         <q-scroll-area style="height: calc(100% - 192px); margin-top: 192px; border-right: 1px solid #ddd">
           <q-list padding>
-            <q-item clickable v-ripple to="/" exact>
+            <q-item clickable v-ripple to="/todo" exact>
               <q-item-section avatar>
                 <q-icon name="list" />
               </q-item-section>
 
               <q-item-section>
-                To-Do
+                To Do
               </q-item-section>
             </q-item>
             <q-item clickable v-ripple to="/help">
