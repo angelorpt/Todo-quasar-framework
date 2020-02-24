@@ -141,6 +141,7 @@
 </template>
 
 <script>
+import { Loading } from 'quasar'
 export default {
   data () {
     return {
@@ -208,14 +209,24 @@ export default {
       }
     },
     getTasks () {
-      this.$axios.get('https://sistemas.offboard.com.br/api/tasks')
+      Loading.show()
+      const url = 'https://sistemas.offboard.com.br/api/tasks'
+      this.$axios.get(url)
         .then(response => {
           this.allTasks = this._.map(response.data, (element) => {
             element.data_vencimento = this.moment(element.data_vencimento).format('YYYY/MM/DD')
             element.realizado = (parseInt(element.realizado) === 1)
             return element
           })
+        })
+        .then(() => {
           this.consultarTasks()
+          Loading.hide()
+        })
+        .catch((response) => {
+          console.log(response)
+          this.$q.notify('Falha na Obtencao de Dados')
+          Loading.hide()
         })
     },
     addTask () {
