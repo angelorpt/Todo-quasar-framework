@@ -223,8 +223,8 @@ export default {
           this.consultarTasks()
           Loading.hide()
         })
-        .catch((response) => {
-          console.log(response)
+        .catch((error) => {
+          console.log(error.response)
           this.$q.notify('Falha na Obtencao de Dados')
           Loading.hide()
         })

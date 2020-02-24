@@ -50,8 +50,13 @@ export default {
           Loading.hide()
           this.$router.push('/todo')
         })
-        .catch((response) => {
-          this.$q.notify('Acesso Negado. Verifique usuário e senha.')
+        .catch((error) => {
+          console.log(error.response)
+          if (error.response.status === 401) {
+            this.$q.notify('Verifique Usuário e Senha')
+          } else {
+            this.$q.notify('Falha na Autenticação')
+          }
           Loading.hide()
         })
     }
