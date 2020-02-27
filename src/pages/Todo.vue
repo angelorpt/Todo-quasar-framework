@@ -168,10 +168,10 @@ export default {
   watch: {
     allTasks () {
       var vm = this
-      const unique = this._.uniqBy(this.allTasks, 'data_vencimento')
-      this.events = vm._.map(unique, (element) => {
+      const unique = this.$_.uniqBy(this.allTasks, 'data_vencimento')
+      this.events = vm.$_.map(unique, (element) => {
         if (element.data_vencimento != null) {
-          return this.moment(element.data_vencimento).format('YYYY/MM/DD')
+          return this.$moment(element.data_vencimento).format('YYYY/MM/DD')
         }
       })
     }
@@ -181,9 +181,9 @@ export default {
       if (this.dataSel === '') {
         this.tasks = this.allTasks
       } else {
-        const lstTasks = this._.filter(this.allTasks, { data_vencimento: this.dataSel })
+        const lstTasks = this.$_.filter(this.allTasks, { data_vencimento: this.dataSel })
         if (lstTasks !== undefined) {
-          if (this._.isArray(lstTasks)) {
+          if (this.$_.isArray(lstTasks)) {
             this.tasks = lstTasks
           } else {
             this.tasks = [lstTasks]
@@ -202,7 +202,7 @@ export default {
       this.tasks = this.allTasks
     },
     eventsFn (date) {
-      if (this._.indexOf(this.events, this.moment(date).format('YYYY/MM/DD')) > -1) {
+      if (this.$_.indexOf(this.events, this.$moment(date).format('YYYY/MM/DD')) > -1) {
         return true
       } else {
         return false
@@ -213,8 +213,8 @@ export default {
       const url = 'https://sistemas.offboard.com.br/api/tasks'
       this.$axios.get(url)
         .then(response => {
-          this.allTasks = this._.map(response.data, (element) => {
-            element.data_vencimento = this.moment(element.data_vencimento).format('YYYY/MM/DD')
+          this.allTasks = this.$_.map(response.data, (element) => {
+            element.data_vencimento = this.$moment(element.data_vencimento).format('YYYY/MM/DD')
             element.realizado = (parseInt(element.realizado) === 1)
             return element
           })
