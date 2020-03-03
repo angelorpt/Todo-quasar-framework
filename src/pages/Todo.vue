@@ -165,6 +165,11 @@ export default {
   mounted () {
     this.refreshTask()
   },
+  computed: {
+    token () {
+      return 'Bearer ' + this.$store.state.token.token
+    }
+  },
   watch: {
     allTasks () {
       var vm = this
@@ -175,6 +180,11 @@ export default {
         }
       })
     }
+    // token () {
+    //   if (this.$store.state.token.token === null) {
+
+    //   }
+    // }
   },
   methods: {
     consultarTasks () {
@@ -209,9 +219,13 @@ export default {
       }
     },
     getTasks () {
+      var vm = this
       Loading.show()
       const url = 'https://sistemas.offboard.com.br/api/tasks'
-      this.$axios.get(url)
+      const config = {
+        headers: { Authorization: vm.token }
+      }
+      this.$axios.get(url, config)
         .then(response => {
           this.allTasks = this.$_.map(response.data, (element) => {
             element.data_vencimento = this.$moment(element.data_vencimento).format('YYYY/MM/DD')
@@ -224,7 +238,7 @@ export default {
           Loading.hide()
         })
         .catch((error) => {
-          console.log(error.response)
+          console.log('status', error.response.status)
           this.$q.notify('Falha na Obtencao de Dados')
           Loading.hide()
         })
@@ -234,8 +248,12 @@ export default {
         this.$q.notify('Informe a tarefa')
         return null
       }
-
-      this.$axios.post('https://sistemas.offboard.com.br/api/tasks', this.task)
+      var vm = this
+      const config = {
+        headers: { Authorization: vm.token },
+        data: vm.task
+      }
+      this.$axios.post('https://sistemas.offboard.com.br/api/tasks', config)
         .then(response => {
           this.task = this.emptyTask()
           this.dataSel = ''
@@ -244,19 +262,31 @@ export default {
     },
     updateTask (task) {
       task.realizado = !task.realizado
-      this.$axios.put('https://sistemas.offboard.com.br/api/tasks/' + task.id, task)
+      var vm = this
+      const config = {
+        headers: { Authorization: vm.token },
+        data: task
+      }
+      this.$axios.put('https://sistemas.offboard.com.br/api/tasks/' + task.id, config)
         .then(response => {
           this.getTasks()
         })
+        .catch((error) => {
+          console.log(error.response)
+        })
     },
     deleteTask (task) {
+      var vm = this
       this.$q.dialog({
         titulo: 'Excluir',
         message: 'Deseja excluir esta tarefa?',
         cancel: true,
         persistent: true
       }).onOk(() => {
-        this.$axios.delete('https://sistemas.offboard.com.br/api/tasks/' + task.id)
+        const config = {
+          headers: { Authorization: vm.token }
+        }
+        this.$axios.delete('https://sistemas.offboard.com.br/api/tasks/' + task.id, config)
           .then(response => {
             this.$q.notify('Tarefa deletada')
             this.getTasks()

@@ -29,8 +29,8 @@ export default {
   data () {
     return {
       user: {
-        email: '',
-        password: ''
+        email: 'offboard@offboard.com.br',
+        password: 'Api!2020'
       }
     }
   },
