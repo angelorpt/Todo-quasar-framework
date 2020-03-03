@@ -40,9 +40,10 @@ export default {
       const url = 'https://sistemas.offboard.com.br/api/auth/login'
       this.$axios.post(url, this.user)
         .then((response) => {
-          console.log(response)
+          // console.log(response)
           if (response.status === 200) {
-            console.log(response.data.access_token)
+            // console.log(response.data.access_token)
+            this.$store.dispatch('token/updateToken', response.data.access_token)
           }
           if (response.status === 401) {
             this.$q.notify('Acesso Negado. Verifique usuário e senha.')
@@ -51,7 +52,7 @@ export default {
           this.$router.push('/todo')
         })
         .catch((error) => {
-          console.log(error.response)
+          // console.log(error.response)
           if (error.response.status === 401) {
             this.$q.notify('Verifique Usuário e Senha')
           } else {

@@ -11,7 +11,7 @@ export default {
   actions: {
     updateToken ({ commit }, value) {
       commit('updateToken', value)
-    },
+    }
   },
   getters: {
     token (state) {
